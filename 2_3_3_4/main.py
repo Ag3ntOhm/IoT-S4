@@ -21,15 +21,34 @@ left_motor = Motor(Port.B)
 right_motor = Motor(Port.C)
 
 bob = DriveBase(left_motor, right_motor, wheel_diameter = 54, axle_track = 121)
-TSensor = TouchSensor(Port.S1)
+CSensor = ColorSensor(Port.S3)
 
-while (True) :  
-    if (TSensor.pressed()) :
-        speed = 25
-        i = 0
-        while(i < 7) :
-            bob.drive(speed,0)
-            wait(1000)
-            speed *= 2
-            i += 1
-        exit()
+angle = 10
+sym = 5
+speed = 250
+bob.drive(250,0)
+
+while (CSensor.color() != Color.RED) :
+    print(CSensor.color())
+    if (CSensor.color() == Color.BLACK) :
+        bob.drive(250,0)
+        angle = 10
+        speed = 250
+        sym = 10
+    elif (CSensor.color() == Color.BLUE) :
+        bob.drive(100,0)
+        speed = 100
+        angle = 10
+        sym = 10
+    else :
+        for i in range(sym) :
+            if (CSensor.color() == Color.BLACK or CSensor.color() == Color.BLUE) :
+                break
+            bob.turn(2)
+        for i in range(sym + sym/2) :
+            if (CSensor.color() == Color.BLACK or CSensor.color() == Color.BLUE) :
+                break
+            bob.turn(-2)
+        sym += 2
+        
+

@@ -23,13 +23,14 @@ right_motor = Motor(Port.C)
 bob = DriveBase(left_motor, right_motor, wheel_diameter = 54, axle_track = 121)
 TSensor = TouchSensor(Port.S1)
 
+
+# Write your program here.
 while (True) :  
     if (TSensor.pressed()) :
-        speed = 25
-        i = 0
-        while(i < 7) :
-            bob.drive(speed,0)
-            wait(1000)
-            speed *= 2
-            i += 1
+        # re
+        ev3.speaker.beep(frequency=293.66, duration=500)
+        ev3.speaker.beep(frequency=293.66, duration=500)
+        ev3.speaker.beep(frequency=587, duration=500)
+        # la
+        ev3.speaker.beep(frequency=440, duration=500)
         exit()

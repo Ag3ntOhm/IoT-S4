@@ -20,16 +20,12 @@ ev3 = EV3Brick()
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.C)
 
-bob = DriveBase(left_motor, right_motor, wheel_diameter = 54, axle_track = 121)
-TSensor = TouchSensor(Port.S1)
+UltraSensor = UltrasonicSensor(Port.S4)
 
-while (True) :  
-    if (TSensor.pressed()) :
-        speed = 25
-        i = 0
-        while(i < 7) :
-            bob.drive(speed,0)
-            wait(1000)
-            speed *= 2
-            i += 1
-        exit()
+left_motor.run(360)
+right_motor.run(360)
+while (True) :
+    if (UltraSensor.distance() < 200):
+        left_motor.brake()
+        right_motor.brake()
+        break

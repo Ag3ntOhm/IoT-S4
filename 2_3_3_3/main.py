@@ -20,16 +20,23 @@ ev3 = EV3Brick()
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.C)
 
-bob = DriveBase(left_motor, right_motor, wheel_diameter = 54, axle_track = 121)
-TSensor = TouchSensor(Port.S1)
 
-while (True) :  
-    if (TSensor.pressed()) :
-        speed = 25
-        i = 0
-        while(i < 7) :
-            bob.drive(speed,0)
-            wait(1000)
-            speed *= 2
-            i += 1
-        exit()
+bob = DriveBase(left_motor, right_motor, wheel_diameter = 54, axle_track = 121)
+CSensor = ColorSensor(Port.S3)
+while (True) :
+    if CSensor.color() == Color.RED :
+        ev3.speaker.beep(frequency=440,duration=200)
+    if CSensor.color() == Color.BLUE :
+        ev3.speaker.beep(frequency=493.88,duration=200)
+    if CSensor.color() == Color.WHITE :
+        ev3.speaker.beep(frequency=523.25,duration=200)
+    if CSensor.color() == Color.BLACK :
+        ev3.speaker.beep(frequency=392,duration=200)
+    if CSensor.color() == Color.YELLOW :
+        ev3.speaker.beep(frequency=311.13,duration=200)
+    if CSensor.color() == Color.GREEN :
+        ev3.speaker.beep(frequency=554.37,duration=200)
+    if CSensor.color() == Color.BROWN :
+        ev3.speaker.beep(frequency=329.63,duration=200)
+    
+

@@ -20,16 +20,9 @@ ev3 = EV3Brick()
 left_motor = Motor(Port.B)
 right_motor = Motor(Port.C)
 
-bob = DriveBase(left_motor, right_motor, wheel_diameter = 54, axle_track = 121)
-TSensor = TouchSensor(Port.S1)
 
-while (True) :  
-    if (TSensor.pressed()) :
-        speed = 25
-        i = 0
-        while(i < 7) :
-            bob.drive(speed,0)
-            wait(1000)
-            speed *= 2
-            i += 1
-        exit()
+bob = DriveBase(left_motor, right_motor, wheel_diameter = 54, axle_track = 121)
+CSensor = ColorSensor(Port.S3)
+ev3.screen.print(CSensor.color())
+
+wait(2000)
