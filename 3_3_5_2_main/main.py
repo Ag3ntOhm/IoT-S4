@@ -15,7 +15,7 @@ import time
 
 # MQTT setup
 MQTT_ClientID = 'bob'
-MQTT_Broker = '192.168.49.231'
+MQTT_Broker = '192.168.4.244'
 MQTT_Topic_Status = 'Lego/Status'
 client = MQTTClient(MQTT_ClientID, MQTT_Broker, 1883)
 
@@ -30,30 +30,11 @@ bob = DriveBase(left_motor, right_motor, wheel_diameter = 54, axle_track = 105)
 s = bob.settings()
 bob.settings(200,200,s[2],s[3])
 
-# List for the way
-L = []
-
-
-def RepWay() :
-    for inst in L :
-        if (inst[0] == 'S') :
-            bob.straight(int(inst[1:]))
-        if (inst[0] == 'T') : 
-            bob.turn(int(inst[1:]))
-
-
-def Store(msg) :
-    print(msg)
-    if (msg == "AF") :
-        RepWay()
-        return
-    if (msg[0] == "B") : 
-        return
-    L.append(msg[1:])
-
-def listen(topic,msg):
-    if topic == MQTT_Topic_Status.encode():
-        Store(msg.decode())
+def listen(topic, msg) :
+    if topic == MQTT_Topic_Status.encode() :
+        data = str(msg.decode())
+        ev3.screen.print(data)
+        ev3.speaker.say(data)
 
 # Write your program here.
 client.connect()
@@ -64,10 +45,7 @@ client.subscribe(MQTT_Topic_Status)
 time.sleep(0.5)
 ev3.screen.print('Listening')
 
-
-
 while True :
     client.check_msg()
-    time.sleep(0.5)
-
+    time.sleep(0.1)
 

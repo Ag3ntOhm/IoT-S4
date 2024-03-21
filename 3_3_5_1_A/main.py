@@ -14,7 +14,7 @@ import time
 
 # MQTT setup
 MQTT_ClientID = 'obo'
-MQTT_Broker = '192.168.110.244'
+MQTT_Broker = '192.168.16.244'
 MQTT_Topic_Status = 'Lego/Status'
 client = MQTTClient(MQTT_ClientID, MQTT_Broker, 1883)
 
@@ -22,22 +22,25 @@ client = MQTTClient(MQTT_ClientID, MQTT_Broker, 1883)
 ev3 = EV3Brick()
 robot_id = 'A'
 
-listA = []
-listB = ["F", "G", "B", "A"]
-
+plays = ["A", "B", "C"]
 song = "C,2,D,4,E,4,F,2,G,4,A,4,B,2,C,4"
 BPM = 120
-# func
+done = [False]
 
-def listen(topic, msg) :
+
+def listen(topic,msg) :
     if topic == MQTT_Topic_Status.encode() :
         data = str(msg.decode())
         ev3.screen.print(data)
-        if (data[0] == robot_id) :
-            beep([data[1:]])
+        if (data[0] in plays) :
+            done[0] = False
+            beep([data])
+        if (data == "Z") :
+            done[0] = True
 
 def beep(note) :
     ev3.speaker.play_notes(note, BPM)
+    done[0] = True
 
 def convert(Song) :
     L = []
@@ -47,48 +50,44 @@ def convert(Song) :
         if (i != 0 and i % 4 == 0) :
             L.append(s)
             s = ""
-        t = Song[i]
+        t = Song[i]  
         if (t == ',') :
             if (i % 2 != 1) :
                 raise SyntaxError("Song invalid syntax")
             if (len(s) == 1) :
-                s+= '/'
+                s+= '2/'
             i += 1
         else :
-            s += Song[i]
+            s += t
             i += 1
+    L.append(s)
     return L
 
-def sorting(L) :
-    T = []
-    for i in range(len(L)) :
-        if L[i][0] in listA :
-            T.append(('A',L[i]))
-        else :
-            T.append(('B',L[i]))
-    return T
-
+def send(data) :
+    done[0] = False
+    client.publish(MQTT_Topic_Status,data)
+    while(not done[0]) :
+        client.check_msg()
 
 # Write your program here.
 client.connect()
 time.sleep(0.5)
 ev3.screen.print("Connected")
 client.set_callback(listen) 
-#client.subscribe(MQTT_Topic_Status) 
+client.subscribe(MQTT_Topic_Status) 
 time.sleep(0.5)
 ev3.screen.print("Listenning...")
 
+start = time.time()
+tick = 0.5
 
-if (robot_id == 'A') :
-    print("in")
-    L = convert(song)
-    T = sorting(L)
-    for i in T :
-        print(i[0] + " " + i[1])
-    for i in range(len(T)) :
-        client.publish(MQTT_Topic_Status, T[i][0] + T[i][1])
-        time.sleep(0.5)
-else :
-    while True :
-        client.check_msg()
-        time.sleep(0.1)
+S = convert(song)
+l = len(S)
+i = 0
+
+while (True) :
+    client.check_msg()
+    if (time.time() - tick >= start and i < l) :
+        start = time.time()
+        send(S[i])
+        i += 1
